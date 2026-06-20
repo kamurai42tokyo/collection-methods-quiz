@@ -323,7 +323,7 @@ body {
 .hero-sprite {
   position: absolute;
   left: 50%;
-  bottom: 24px;
+  bottom: 14px; /* 足元が草地に接地するよう下げる (旧24px=浮いて見えた) */
   width: 110px;
   height: 130px;
   transform: translateX(-50%);
