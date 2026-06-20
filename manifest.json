@@ -1,7 +1,7 @@
 {
-  "name": "Collection Methods Quiz",
-  "short_name": "CM Quiz",
-  "description": "Pythonのコレクション型(list/dict/set/tuple/str)のメソッドをクイズで学ぶアプリ",
+  "name": "Collection Quest",
+  "short_name": "CQuest",
+  "description": "Pythonのコレクション型(list/dict/set/tuple/str)のメソッドを、進化する勇者と一緒にRPG風クイズで学ぶアプリ",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

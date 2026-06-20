@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f172a" />
-  <meta name="description" content="Pythonのコレクション型(list/dict/set/tuple/str)のメソッドをクイズで学ぶアプリ" />
-  <title>Collection Methods Quiz</title>
+  <meta name="theme-color" content="#1a1206" />
+  <meta name="description" content="Pythonのコレクション型(list/dict/set/tuple/str)のメソッドを、進化する勇者と一緒にRPG風クイズで学ぶアプリ" />
+  <title>Collection Quest — Python メソッドの冒険</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon.svg" />
   <link rel="stylesheet" href="css/style.css" />
@@ -13,22 +13,22 @@
 </head>
 <body>
   <header class="app-header">
-    <h1>📚 Collection Methods Quiz</h1>
-    <p class="subtitle">Python コレクション型メソッド学習</p>
+    <h1>⚔️ Collection Quest</h1>
+    <p class="subtitle">Python コレクション型メソッドの ぼうけん</p>
   </header>
 
   <main class="app-main">
     <!-- スタート画面 -->
     <section id="start-screen" class="screen">
-      <div class="card">
-        <h2>出題範囲を選ぶ</h2>
+      <div class="card rpg-window">
+        <h2>⚔ たたかう型をえらぶ</h2>
         <div id="type-filters" class="type-filters" role="group" aria-label="出題する型"></div>
 
-        <h2>出題形式</h2>
+        <h2>📜 しゅつだいの かたち</h2>
         <div id="mode-filters" class="mode-filters" role="group" aria-label="出題形式"></div>
 
         <label class="count-row">
-          問題数
+          🗺️ ダンジョンの長さ
           <select id="question-count">
             <option value="5">5問</option>
             <option value="10" selected>10問</option>
@@ -36,48 +36,64 @@
           </select>
         </label>
 
-        <button id="start-btn" class="btn btn-primary">クイズを始める</button>
+        <button id="start-btn" class="btn btn-primary">▶ ぼうけんに でる</button>
         <p id="start-error" class="error-text" hidden>型と形式を1つ以上選んでください。</p>
       </div>
     </section>
 
     <!-- クイズ画面 -->
     <section id="quiz-screen" class="screen" hidden>
+      <!-- 歩く勇者ステージ -->
+      <div class="hero-stage">
+        <div class="hero-banner">
+          <span id="hero-lv" class="hero-lv">Lv.—</span>
+          <span id="hero-title" class="hero-title">たびだちの村人</span>
+        </div>
+        <div class="hero-scene">
+          <div id="hero-sprite" class="hero-sprite"></div>
+          <div class="hero-ground"></div>
+          <div id="levelup-pop" class="levelup-pop" hidden>レベルアップ！</div>
+        </div>
+      </div>
+
       <div class="quiz-top">
         <span id="progress" class="progress-pill">1 / 10</span>
-        <span id="score" class="score-pill">正解 0</span>
+        <span id="score" class="score-pill">⚔ 撃破 0</span>
       </div>
-      <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+      <div class="exp-bar" title="EXP"><div id="progress-fill" class="exp-fill"></div></div>
 
-      <div class="card">
+      <div class="card rpg-window">
         <span id="q-tag" class="q-tag">動作当て</span>
         <p id="question-text" class="question-text"></p>
         <pre id="question-code" class="code-block" hidden></pre>
         <div id="choices" class="choices"></div>
         <div id="feedback" class="feedback" hidden></div>
-        <button id="next-btn" class="btn btn-primary" hidden>次の問題 →</button>
+        <button id="next-btn" class="btn btn-primary" hidden>つぎへ ▶</button>
       </div>
     </section>
 
     <!-- 結果画面 -->
     <section id="result-screen" class="screen" hidden>
-      <div class="card result-card">
-        <h2>結果</h2>
+      <div class="card rpg-window result-card">
+        <h2>🏰 クエスト クリア！</h2>
+        <div id="result-hero" class="result-hero"></div>
+        <p id="result-rank" class="result-rank"></p>
         <p id="result-score" class="result-score"></p>
         <p id="result-message" class="result-message"></p>
         <div class="result-actions">
-          <button id="retry-btn" class="btn btn-primary">もう一度(同じ設定)</button>
-          <button id="home-btn" class="btn btn-ghost">設定を変える</button>
+          <button id="retry-btn" class="btn btn-primary">▶ もう一度 ぼうける</button>
+          <button id="home-btn" class="btn btn-ghost">じゅんびに もどる</button>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="app-footer">
-    <small>list / dict / set / tuple / str のメソッドを学べます</small>
+    <small>list / dict / set / tuple / str のメソッドを まなぶ ぼうけん</small>
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/hero.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

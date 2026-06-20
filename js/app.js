@@ -167,7 +167,15 @@
     state.index = 0;
     state.score = 0;
     showScreen("quiz-screen");
+    if (window.Hero) Hero.reset(); // 勇者を旅立ちの姿に
     renderQuestion();
+  }
+
+  // EXPバーとスコア表示を現在の撃破数で更新
+  function updateGauges() {
+    var total = state.questions.length;
+    $("score").textContent = "⚔ 撃破 " + state.score;
+    $("progress-fill").style.width = (state.score / total * 100) + "%";
   }
 
   function renderQuestion() {
@@ -176,8 +184,7 @@
     var total = state.questions.length;
 
     $("progress").textContent = (state.index + 1) + " / " + total;
-    $("score").textContent = "正解 " + state.score;
-    $("progress-fill").style.width = ((state.index) / total * 100) + "%";
+    updateGauges();
     $("q-tag").textContent = q.mode.label;
     $("question-text").textContent = q.questionText;
 
@@ -215,22 +222,24 @@
       else if (b === btn) b.classList.add("wrong");
     });
 
-    // 解説
+    // 解説 (RPG文言)
     var fb = $("feedback");
     var a = q.answer;
     fb.innerHTML =
       '<span class="verdict ' + (isCorrect ? "ok" : "ng") + '">' +
-      (isCorrect ? "正解!" : "不正解") + '</span> ' +
+      (isCorrect ? "⚔ かいしんの いちげき！" : "💥 ミス！ てきの こうげき") + '</span> ' +
       '<code>' + escapeHtml(a.signature) + '</code>' +
       '<div class="explain">' + escapeHtml(a.description) +
       '（戻り値: ' + escapeHtml(a.returns) + ' / ' +
       (a.mutating ? "破壊的: 元を変更する" : "非破壊的: 元は変わらない") + '）</div>';
     fb.hidden = false;
 
-    $("score").textContent = "正解 " + state.score;
+    // 撃破数・EXP・勇者の姿を更新 (正解でレベルアップ)
+    updateGauges();
+    if (window.Hero) Hero.update(state.score);
 
     var nextBtn = $("next-btn");
-    nextBtn.textContent = (state.index + 1 < state.questions.length) ? "次の問題 →" : "結果を見る →";
+    nextBtn.textContent = (state.index + 1 < state.questions.length) ? "つぎへ ▶" : "けっかへ ▶";
     nextBtn.hidden = false;
   }
 
@@ -244,12 +253,20 @@
     showScreen("result-screen");
     var total = state.questions.length;
     var pct = Math.round(state.score / total * 100);
-    $("result-score").textContent = state.score + " / " + total;
+
+    // 到達した勇者の姿と称号
+    if (window.Hero) {
+      $("result-hero").innerHTML = Hero.svg(state.score);
+      var lvLabel = state.score <= 0 ? "Lv.—" : "Lv." + Math.min(state.score, Hero.MAX_LEVEL);
+      $("result-rank").textContent = "称号: " + Hero.titleOf(state.score) + " （" + lvLabel + "）";
+    }
+
+    $("result-score").textContent = "⚔ 撃破 " + state.score + " / " + total;
     var msg;
-    if (pct === 100) msg = "満点! 完璧です 🎉";
-    else if (pct >= 80) msg = "good! あと少しで満点 💪";
-    else if (pct >= 50) msg = "その調子。解説を見て復習しよう 📖";
-    else msg = "まずはリファレンスで確認してみよう 🌱";
+    if (pct === 100) msg = "全敵 撃破！ 伝説の勇者だ 🎉";
+    else if (pct >= 80) msg = "あと少しで全クリア！ つよい 💪";
+    else if (pct >= 50) msg = "なかなかの腕前。解説で さらに強くなろう 📖";
+    else msg = "まだ旅は始まったばかり。再挑戦で育てよう 🌱";
     $("result-message").textContent = "正答率 " + pct + "% — " + msg;
   }
 
