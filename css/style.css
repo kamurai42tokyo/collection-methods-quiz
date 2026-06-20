@@ -356,17 +356,22 @@ body {
 /* 脚は上下にステップ (足が地面付近に残るので外れて見えない) */
 .h-leg-a { animation: stepA 0.7s ease-in-out infinite; }
 .h-leg-b { animation: stepB 0.7s ease-in-out infinite; }
-/* 後ろ腕だけ肩(=bboxの上端)を軸に小さく振る。剣を持つ前腕は静止させ手足の浮きを防ぐ */
+/* 腕の振り: 後ろ腕(常時)と、武器なし時の前腕(逆位相)。武器を持つ前腕は静止 */
 .h-arm-b { transform-origin: 50% 0; animation: armSwing 0.7s ease-in-out infinite; }
+.h-arm-f-swing { transform-box: fill-box; transform-origin: 50% 0; animation: armSwingOpp 0.7s ease-in-out infinite; }
 .h-cape { transform-box: fill-box; transform-origin: 50% 0; animation: capeSway 0.9s ease-in-out infinite; }
 .h-spark { animation: sparkle 1.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 .h-aura { animation: auraPulse 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.h-halo { animation: auraPulse 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.h-flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 0.5s ease-in-out infinite; }
 
 @keyframes heroBob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-3px) rotate(1.5deg); } }
 @keyframes stepA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 @keyframes stepB { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(0); } }
 @keyframes armSwing { 0%, 100% { transform: rotate(12deg); } 50% { transform: rotate(-12deg); } }
+@keyframes armSwingOpp { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
 @keyframes capeSway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg); } }
+@keyframes flicker { 0%, 100% { opacity: 0.85; transform: scaleY(1); } 50% { opacity: 1; transform: scaleY(1.18); } }
 @keyframes sparkle { 0%, 100% { opacity: 0.2; transform: scale(0.6); } 50% { opacity: 1; transform: scale(1.2); } }
 @keyframes auraPulse { 0%, 100% { opacity: 0.7; transform: scale(0.97); } 50% { opacity: 1; transform: scale(1.05); } }
 @keyframes groundScroll { from { background-position: 0 0; } to { background-position: -52px 0; } }
@@ -463,6 +468,7 @@ body {
 
 /* ---------- アクセシビリティ: モーション軽減 ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .h-body, .h-leg-a, .h-leg-b, .h-arm-f, .h-arm-b, .h-cape, .h-spark, .h-aura,
+  .h-body, .h-leg-a, .h-leg-b, .h-arm-f-swing, .h-arm-b, .h-cape, .h-spark, .h-aura,
+  .h-halo, .h-flame,
   .hero-ground, .hero-ground::after, .hero-scene::before { animation: none !important; }
 }
