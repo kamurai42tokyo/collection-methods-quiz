@@ -350,20 +350,22 @@ body {
   animation: groundScroll 0.7s linear infinite;
 }
 
-/* ---------- 歩行アニメーション ---------- */
-.h-body { transform-box: fill-box; transform-origin: 50% 100%; animation: heroBob 0.6s ease-in-out infinite; }
+/* ---------- 歩行アニメーション (かわいいチビ・わたわた歩き) ---------- */
+.h-body { transform-box: fill-box; transform-origin: 50% 100%; animation: heroBob 0.7s ease-in-out infinite; }
 .h-leg, .h-arm { transform-box: fill-box; }
-.h-leg-a { animation: legSwingA 0.6s ease-in-out infinite; }
-.h-leg-b { animation: legSwingB 0.6s ease-in-out infinite; }
-.h-arm-f { animation: legSwingB 0.6s ease-in-out infinite; } /* 前腕は奥脚と同位相 */
-.h-arm-b { animation: legSwingA 0.6s ease-in-out infinite; }
+/* 脚は上下にステップ (足が地面付近に残るので外れて見えない) */
+.h-leg-a { animation: stepA 0.7s ease-in-out infinite; }
+.h-leg-b { animation: stepB 0.7s ease-in-out infinite; }
+/* 後ろ腕だけ肩(=bboxの上端)を軸に小さく振る。剣を持つ前腕は静止させ手足の浮きを防ぐ */
+.h-arm-b { transform-origin: 50% 0; animation: armSwing 0.7s ease-in-out infinite; }
 .h-cape { transform-box: fill-box; transform-origin: 50% 0; animation: capeSway 0.9s ease-in-out infinite; }
 .h-spark { animation: sparkle 1.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 .h-aura { animation: auraPulse 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 
-@keyframes heroBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-@keyframes legSwingA { 0%, 100% { transform: rotate(20deg); } 50% { transform: rotate(-20deg); } }
-@keyframes legSwingB { 0%, 100% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } }
+@keyframes heroBob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-3px) rotate(1.5deg); } }
+@keyframes stepA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes stepB { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(0); } }
+@keyframes armSwing { 0%, 100% { transform: rotate(12deg); } 50% { transform: rotate(-12deg); } }
 @keyframes capeSway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg); } }
 @keyframes sparkle { 0%, 100% { opacity: 0.2; transform: scale(0.6); } 50% { opacity: 1; transform: scale(1.2); } }
 @keyframes auraPulse { 0%, 100% { opacity: 0.7; transform: scale(0.97); } 50% { opacity: 1; transform: scale(1.05); } }

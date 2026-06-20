@@ -49,35 +49,36 @@ window.Hero = (function () {
     return ranges[ranges.length - 1][1];
   }
 
-  // 各パーツの段階を idx(=level) から決定
+  // 各パーツの段階を idx(=level 0..20) から決定 (かわいいチビ勇者・累積進化)
   function featuresOf(idx) {
     return {
-      armor: pick(idx, [[3, "#8b5a2b"], [6, "#a16207"], [9, "#94a3b8"], [12, "#cbd5e1"], [16, "#f5c518"], [20, "#ffe98a"]]),
-      armorEdge: pick(idx, [[3, "#5c3a1a"], [6, "#6b4410"], [9, "#64748b"], [12, "#94a3b8"], [16, "#b8860b"], [20, "#f5c518"]]),
-      weapon: pick(idx, [[1, "stick"], [4, "bronze"], [8, "iron"], [11, "steel"], [14, "glow"], [17, "flame"], [20, "legend"]]),
-      helmet: pick(idx, [[1, "none"], [3, "band"], [6, "cap"], [10, "iron"], [15, "wing"], [20, "crown"]]),
-      shield: pick(idx, [[2, "none"], [6, "wood"], [11, "iron"], [16, "gold"], [20, "radiant"]]),
-      cape: pick(idx, [[6, "none"], [11, "red"], [16, "purple"], [20, "gold"]]),
-      aura: pick(idx, [[11, "none"], [14, "faint"], [17, "glow"], [19, "strong"], [20, "storm"]])
+      armor:     pick(idx, [[3, "#9c6b3f"], [6, "#a8843c"], [9, "#9aa6b2"], [12, "#cdd6df"], [16, "#f5c518"], [20, "#ffe98a"]]),
+      armorEdge: pick(idx, [[3, "#6e4a28"], [6, "#7a5e25"], [9, "#5f6b78"], [12, "#94a3b8"], [16, "#b8860b"], [20, "#d4a017"]]),
+      weapon:    pick(idx, [[1, "wood"], [4, "bronze"], [8, "iron"], [11, "steel"], [14, "glow"], [17, "flame"], [20, "legend"]]),
+      helmet:    pick(idx, [[1, "none"], [5, "cap"], [10, "iron"], [15, "wing"], [20, "crown"]]),
+      cape:      pick(idx, [[6, "none"], [11, "red"], [16, "purple"], [20, "gold"]]),
+      aura:      pick(idx, [[11, "none"], [14, "faint"], [17, "glow"], [19, "strong"], [20, "storm"]])
     };
   }
 
-  // ---- パーツ描画 (SVG文字列) ----
+  // ---- パーツ描画 (SVG文字列。viewBox 0 0 100 120) ----
   function drawAura(a) {
     if (a === "none") return "";
     var map = {
-      faint:  { r: 46, op: 0.18, c: "#fde68a" },
-      glow:   { r: 50, op: 0.28, c: "#fde68a" },
-      strong: { r: 54, op: 0.38, c: "#fff3bf" },
-      storm:  { r: 58, op: 0.5,  c: "#fff7d6" }
+      faint:  { r: 42, op: 0.16 },
+      glow:   { r: 45, op: 0.24 },
+      strong: { r: 48, op: 0.34 },
+      storm:  { r: 52, op: 0.45 }
     }[a];
-    var s = '<circle class="h-aura" cx="60" cy="84" r="' + map.r + '" fill="' + map.c + '" opacity="' + map.op + '"/>';
-    if (a === "strong" || a === "storm") {
-      // きらめき粒子
-      var pts = [[24, 50], [96, 54], [30, 110], [92, 108], [60, 30]];
-      for (var i = 0; i < pts.length; i++) {
-        s += '<circle class="h-spark" cx="' + pts[i][0] + '" cy="' + pts[i][1] + '" r="2.4" fill="#fff7d6" opacity="0.9" style="animation-delay:' + (i * 0.18) + 's"/>';
-      }
+    return '<circle class="h-aura" cx="50" cy="62" r="' + map.r + '" fill="#fde68a" opacity="' + map.op + '"/>';
+  }
+
+  function drawSparks(a) {
+    if (a !== "strong" && a !== "storm") return "";
+    var pts = [[20, 40], [80, 44], [26, 92], [78, 88], [50, 16]];
+    var s = "";
+    for (var i = 0; i < pts.length; i++) {
+      s += '<circle class="h-spark" cx="' + pts[i][0] + '" cy="' + pts[i][1] + '" r="2.2" fill="#fff7d6" style="animation-delay:' + (i * 0.18) + 's"/>';
     }
     return s;
   }
@@ -85,92 +86,77 @@ window.Hero = (function () {
   function drawCape(c) {
     if (c === "none") return "";
     var col = { red: "#dc2626", purple: "#7c3aed", gold: "#f5c518" }[c];
-    var dark = { red: "#991b1b", purple: "#5b21b6", gold: "#b8860b" }[c];
-    // 肩から下へ広がる布 (歩行で揺れる)
-    return '<path class="h-cape" d="M48 74 Q40 110 46 132 L74 132 Q80 110 72 74 Z" fill="' + col + '" stroke="' + dark + '" stroke-width="1.5"/>';
-  }
-
-  function drawShield(s) {
-    if (s === "none") return "";
-    var face = { wood: "#a16207", iron: "#94a3b8", gold: "#f5c518", radiant: "#ffe98a" }[s];
-    var edge = { wood: "#6b4410", iron: "#475569", gold: "#b8860b", radiant: "#f5c518" }[s];
-    // 後ろ腕側 (左手)
-    return '<g transform="translate(34,86)">' +
-      '<path d="M0 -10 L13 -10 Q16 0 13 14 L6.5 20 L0 14 Q-3 0 0 -10 Z" fill="' + face + '" stroke="' + edge + '" stroke-width="2"/>' +
-      '<circle cx="6.5" cy="5" r="2.4" fill="' + edge + '"/></g>';
+    return '<path class="h-cape" d="M36 50 Q28 84 36 100 L64 100 Q72 84 64 50 Z" fill="' + col + '" stroke="rgba(0,0,0,.3)" stroke-width="1.5"/>';
   }
 
   function drawWeapon(w) {
-    // 前腕(右手)に持たせる。柄~刃を上方向に立てる
-    var blade, hilt = "#7c4a12";
+    // 前腕の手元 translate(70,60) を原点に、上向きに刃を立てる
     switch (w) {
-      case "stick":  blade = '<rect x="-1.5" y="-30" width="3" height="34" rx="1.5" fill="#9a6b3f"/>'; break;
-      case "bronze": blade = '<rect x="-2" y="-32" width="4" height="30" rx="1.5" fill="#cd7f32"/><rect x="-6" y="-4" width="12" height="3" rx="1.5" fill="' + hilt + '"/>'; break;
-      case "iron":   blade = '<rect x="-2.5" y="-38" width="5" height="36" rx="2" fill="#cbd5e1"/><rect x="-7" y="-4" width="14" height="3.5" rx="1.5" fill="' + hilt + '"/>'; break;
-      case "steel":  blade = '<polygon points="0,-44 3,-38 3,-4 -3,-4 -3,-38" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/><rect x="-8" y="-4" width="16" height="3.5" rx="1.5" fill="#475569"/>'; break;
-      case "glow":   blade = '<polygon points="0,-48 3.5,-40 3.5,-4 -3.5,-4 -3.5,-40" fill="#bae6fd" stroke="#38bdf8" stroke-width="1.5"/><rect x="-9" y="-4" width="18" height="4" rx="2" fill="#0ea5e9"/>'; break;
-      case "flame":  blade = '<polygon points="0,-52 4,-42 4,-4 -4,-4 -4,-42" fill="#fb923c" stroke="#ea580c" stroke-width="1.5"/><polygon points="0,-58 3,-50 -3,-50" fill="#fde047"/><rect x="-9" y="-4" width="18" height="4" rx="2" fill="#7c2d12"/>'; break;
-      default:       blade = '<polygon points="0,-58 5,-46 5,-4 -5,-4 -5,-46" fill="#fde68a" stroke="#f5c518" stroke-width="2"/><polygon points="0,-66 4,-56 -4,-56" fill="#fffbeb"/><rect x="-12" y="-4" width="24" height="5" rx="2.5" fill="#b8860b"/>'; break;
+      case "wood":   return '<rect x="-1.5" y="-26" width="3" height="28" rx="1.5" fill="#9a6b3f"/>';
+      case "bronze": return '<rect x="-2" y="-28" width="4" height="26" rx="1.5" fill="#cd7f32"/><rect x="-6" y="-2" width="12" height="3" rx="1.5" fill="#7c4a12"/>';
+      case "iron":   return '<polygon points="0,-34 3,-28 3,-2 -3,-2 -3,-28" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/><rect x="-7" y="-2" width="14" height="3" rx="1.5" fill="#475569"/>';
+      case "steel":  return '<polygon points="0,-38 3.4,-31 3.4,-2 -3.4,-2 -3.4,-31" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.2"/><rect x="-8" y="-2" width="16" height="3.4" rx="1.5" fill="#475569"/>';
+      case "glow":   return '<polygon points="0,-40 3.5,-32 3.5,-2 -3.5,-2 -3.5,-32" fill="#bae6fd" stroke="#38bdf8" stroke-width="1.5"/><rect x="-8" y="-2" width="16" height="3.5" rx="1.5" fill="#0ea5e9"/>';
+      case "flame":  return '<polygon points="0,-44 4,-34 4,-2 -4,-2 -4,-34" fill="#fb923c" stroke="#ea580c" stroke-width="1.5"/><polygon points="0,-50 3,-42 -3,-42" fill="#fde047"/><rect x="-9" y="-2" width="18" height="4" rx="2" fill="#7c2d12"/>';
+      default:       return '<polygon points="0,-46 5,-35 5,-2 -5,-2 -5,-35" fill="#fde68a" stroke="#f5c518" stroke-width="2"/><polygon points="0,-52 4,-44 -4,-44" fill="#fffbeb"/><rect x="-10" y="-2" width="20" height="4" rx="2" fill="#b8860b"/>';
     }
-    return blade;
   }
 
-  function drawHelmet(h, edge) {
+  function drawHelmet(h) {
     switch (h) {
       case "none": return "";
-      case "band": return '<rect x="42" y="46" width="36" height="6" rx="3" fill="#dc2626"/>';
-      case "cap":  return '<path d="M40 50 Q60 32 80 50 Z" fill="#a16207" stroke="#6b4410" stroke-width="1.5"/>';
-      case "iron": return '<path d="M40 52 Q60 28 80 52 L80 56 L40 56 Z" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/><rect x="56" y="48" width="8" height="14" rx="2" fill="#94a3b8"/>';
-      case "wing": return '<path d="M40 52 Q60 26 80 52 L80 56 L40 56 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>' +
-                          '<path d="M40 48 Q26 40 30 54 Q38 50 42 52 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>' +
-                          '<path d="M80 48 Q94 40 90 54 Q82 50 78 52 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>';
-      default:     return '<path d="M44 46 L50 34 L56 44 L60 30 L64 44 L70 34 L76 46 Z" fill="#f5c518" stroke="#b8860b" stroke-width="1.5"/>' +
-                          '<circle cx="60" cy="34" r="2.6" fill="#ef4444"/>';
+      case "cap":  return '<path d="M30 26 Q50 6 70 26 Z" fill="#a8843c" stroke="#7a5e25" stroke-width="1.5"/>';
+      case "iron": return '<path d="M30 26 Q50 4 70 26 L70 30 L30 30 Z" fill="#cdd6df" stroke="#94a3b8" stroke-width="2"/><rect x="47" y="26" width="6" height="12" rx="2" fill="#b9c4cf"/>';
+      case "wing": return '<path d="M30 26 Q50 2 70 26 L70 30 L30 30 Z" fill="#e6edf3" stroke="#94a3b8" stroke-width="2"/>' +
+                          '<path d="M30 22 Q16 14 20 26 Q27 22 32 24 Z" fill="#fff"/>' +
+                          '<path d="M70 22 Q84 14 80 26 Q73 22 68 24 Z" fill="#fff"/>';
+      default:     return '<path d="M34 20 L40 8 L46 18 L50 5 L54 18 L60 8 L66 20 Z" fill="#f5c518" stroke="#b8860b" stroke-width="1.5"/>' +
+                          '<circle cx="50" cy="9" r="2.4" fill="#ef4444"/>';
     }
   }
 
-  // ---- 勇者まるごとのSVG ----
+  // ---- 勇者まるごとのSVG (かわいいチビ・常時歩行) ----
   function buildSVG(level) {
     var idx = Math.max(0, Math.min(MAX_LEVEL, level));
     var f = featuresOf(idx);
+    var armor = f.armor, edge = f.armorEdge;
 
-    var svg = '<svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+    var svg = '<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
     svg += drawAura(f.aura);
-    svg += drawCape(f.cape);
-    svg += drawShield(f.shield);
 
-    // 本体グループ (上下バウンド)
+    // 本体 (全体が上下バウンド＆わずかに左右に揺れる)
     svg += '<g class="h-body">';
 
-    // 後ろ腕
-    svg += '<g class="h-arm h-arm-b" style="transform-origin:46px 76px"><rect x="42" y="76" width="8" height="26" rx="4" fill="#e8b48a"/></g>';
+    svg += drawCape(f.cape); // 背中 (本体と一緒に動き、独自に揺れる)
 
-    // 脚 (交互に振る)
-    svg += '<g class="h-leg h-leg-a" style="transform-origin:54px 104px"><rect x="50" y="104" width="9" height="28" rx="4" fill="' + f.armorEdge + '"/><rect x="48" y="128" width="13" height="8" rx="3" fill="#3f2d1a"/></g>';
-    svg += '<g class="h-leg h-leg-b" style="transform-origin:66px 104px"><rect x="61" y="104" width="9" height="28" rx="4" fill="' + f.armorEdge + '"/><rect x="59" y="128" width="13" height="8" rx="3" fill="#3f2d1a"/></g>';
+    // 脚 (上下にステップ。足が常に地面付近に残るので外れて見えない)
+    svg += '<g class="h-leg h-leg-a"><rect x="40" y="86" width="9" height="20" rx="4.5" fill="' + edge + '"/><ellipse cx="44.5" cy="107" rx="6" ry="4" fill="#3f2d1a"/></g>';
+    svg += '<g class="h-leg h-leg-b"><rect x="51" y="86" width="9" height="20" rx="4.5" fill="' + edge + '"/><ellipse cx="55.5" cy="107" rx="6" ry="4" fill="#3f2d1a"/></g>';
 
-    // 胴(鎧)
-    svg += '<rect x="46" y="68" width="28" height="42" rx="9" fill="' + f.armor + '" stroke="' + f.armorEdge + '" stroke-width="2"/>';
-    // 鎧の胸ライン
-    svg += '<line x1="60" y1="72" x2="60" y2="104" stroke="' + f.armorEdge + '" stroke-width="1.5" opacity="0.6"/>';
+    // 後ろ腕 (肩を軸に小さく前後に振る)
+    svg += '<g class="h-arm h-arm-b"><rect x="26" y="60" width="8" height="20" rx="4" fill="' + armor + '" stroke="' + edge + '" stroke-width="1.5"/></g>';
 
-    // 頭
-    svg += '<circle cx="60" cy="50" r="18" fill="#f1c79e"/>';
-    // 顔
-    svg += '<circle cx="54" cy="50" r="2.1" fill="#3b2417"/><circle cx="66" cy="50" r="2.1" fill="#3b2417"/>';
-    svg += '<path d="M55 58 Q60 61 65 58" stroke="#8a5a36" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
-    // 髪
-    svg += '<path d="M42 46 Q44 30 60 30 Q76 30 78 46 Q70 40 60 40 Q50 40 42 46 Z" fill="#5b3a1d"/>';
+    // 胴 (一続きの卵形シルエット＋アウトライン)
+    svg += '<path d="M50 44 C66 44 70 60 70 76 C70 92 60 96 50 96 C40 96 30 92 30 76 C30 60 34 44 50 44 Z" fill="' + armor + '" stroke="' + edge + '" stroke-width="2.5"/>';
+    svg += '<path d="M50 52 L50 92" stroke="' + edge + '" stroke-width="1.5" opacity="0.5"/>';
+
+    // 頭・髪
+    svg += '<circle cx="50" cy="30" r="20" fill="#f3d2a8" stroke="#d9a87a" stroke-width="1.5"/>';
+    svg += '<path d="M30 30 Q30 10 50 10 Q70 10 70 30 Q60 22 50 22 Q40 22 30 30 Z" fill="#6b4423"/>';
+    // 顔 (つぶらな目・ハイライト・ほっぺ・やさしい口)
+    svg += '<ellipse cx="43" cy="32" rx="2.6" ry="3.2" fill="#3b2417"/><ellipse cx="57" cy="32" rx="2.6" ry="3.2" fill="#3b2417"/>';
+    svg += '<circle cx="42" cy="31" r="0.9" fill="#fff"/><circle cx="56" cy="31" r="0.9" fill="#fff"/>';
+    svg += '<circle cx="38" cy="38" r="2.4" fill="#f0a59a" opacity="0.6"/><circle cx="62" cy="38" r="2.4" fill="#f0a59a" opacity="0.6"/>';
+    svg += '<path d="M46 39 Q50 42 54 39" stroke="#b3724e" stroke-width="1.4" fill="none" stroke-linecap="round"/>';
     // 兜
-    svg += drawHelmet(f.helmet, f.armorEdge);
+    svg += drawHelmet(f.helmet);
 
-    // 前腕 + 武器
-    svg += '<g class="h-arm h-arm-f" style="transform-origin:74px 76px">';
-    svg += '<rect x="70" y="76" width="8" height="26" rx="4" fill="#e8b48a"/>';
-    svg += '<g transform="translate(74,100)">' + drawWeapon(f.weapon) + '</g>';
-    svg += '</g>';
+    // 前腕＋武器 (剣は構えたまま＝歩行中も静止。手足の浮きを防ぐ)
+    svg += '<g class="h-arm h-arm-f"><rect x="66" y="60" width="8" height="20" rx="4" fill="' + armor + '" stroke="' + edge + '" stroke-width="1.5"/>';
+    svg += '<g transform="translate(70,60)">' + drawWeapon(f.weapon) + '</g></g>';
 
     svg += '</g>'; // h-body
+    svg += drawSparks(f.aura); // きらめき (最前面)
     svg += '</svg>';
     return svg;
   }
